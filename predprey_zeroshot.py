@@ -7,7 +7,6 @@ from gym_multigrid.envs.prey_pred import (
 import torch
 import numpy as np
 from agents import *
-#import tensorboard_reducer as tbr
 from stats import *
 from collections import Counter
 import wandb
@@ -38,7 +37,7 @@ algs = [
         gpat_lin_name,
         pistar_name
     ]
-base_dir = "/Users/rupaln/Documents/uiuc/research/SFCollect/experiments/rlc/pred-prey/"
+base_dir = ""
 
 for i in range(num_runs):
     print("beginning replicate " + str(i))
@@ -48,13 +47,11 @@ for i in range(num_runs):
         dirname=model_dir,
         filename=f"learner_for_team1",
         w=w_team,
-        #w=np.load(f"{model_dir}learner_for_team1.npy")
     )
     pi2 = SFPartnerAgent(
         dirname=model_dir,
         filename=f"learner_for_team2",
         w=w_team,
-        #w=np.load(f"{model_dir}learner_for_team2.npy")
     )
     rob_agent = SFPartnerAgent(
         dirname=model_dir,
@@ -90,17 +87,16 @@ for i in range(num_runs):
         dirname=model_dir,
         filename=f"learner_for_newteam",
         w=w_team,
-        #w=np.load(f"{model_dir}learner_for_newteam.npy")
     )
     greedy_policy_1 = GreedyPredatorPolicy(new_pref[0], random_generator=env.np_random)
     greedy_policy_2 = GreedyPredatorPolicy(new_pref[1], random_generator=env.np_random)
     agent_tuples = [
-                    # (pi1_name, pi1), 
-                    # (pi2_name, pi2), 
-                    # (robust_name, rob_agent),
+                    (pi1_name, pi1), 
+                    (pi2_name, pi2), 
+                    (robust_name, rob_agent),
                     (mesh_name, mesh_agent),
-                    # (gpat_lin_name, w_gpat), 
-                    # (pistar_name, pistar)
+                    (gpat_lin_name, w_gpat), 
+                    (pistar_name, pistar)
                     ]
     run = wandb.init(
         project="pred-prey1-mesh",
@@ -163,8 +159,6 @@ for i in range(num_runs):
                 run.log({f"{agent_name}/{cp_key}": cp_pred})
             rew_arr.append(ep_rew)
             ret_arr.append(ep_ret)
-        print(agent_name, np.mean(np.array(rew_arr)), np.std(np.array(rew_arr)))
-        print(agent_name, np.mean(np.array(ret_arr)), np.std(np.array(ret_arr)))
         os.makedirs(os.path.dirname(animation_path), exist_ok=True)
         imageio.mimsave(animation_path, frames, duration=2, loop=20)
         if agent_name == 'gpi' or agent_name == 'w-gpat' or agent_name == 'q-gpat':
