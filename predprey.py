@@ -40,8 +40,6 @@ def get_dr(env, agents, num_preds, ac_dim, a_p):
         all_actions = [a] + a_p
         obs_next, rew, terminated, truncated, info_next = copy.deepcopy(env).step(all_actions)
         rewards[a] = rew
-        #rewards[a] = step(all_actions, grid, agents, num_preds)
-    #print(rewards)
     return np.mean(rewards)
 
 def get_prey_actions(env, agents, num_preds):
@@ -96,8 +94,8 @@ def collect_traj(team, env_str, episodes):
     return X, y
 
 def compute_w_dr():
-    num_runs = 1
-    model_dir = "/Users/rupaln/Documents/uiuc/research/SFCollect/experiments/rlc/pred-prey/models/"
+    num_runs = 10
+    model_dir = ""
     path_suffix = "learner_for_team2"
     env = ToroidPredPrey(gym.make("multigrid-preypred-v0"))
     episodes = 10
@@ -130,9 +128,6 @@ def compute_w_dr():
         print("computing weights for " + path_suffix)
         X, y = collect_traj(team=team, env_str="multigrid-preypred-v0", episodes=episodes)
         w = LinearRegression().fit(X, y)
-        print(w.score(X, y))
-        # weight = np.array(w.coef_) / np.linalg.norm(np.array(w.coef_), ord=1)
-        print(w.coef_)
         np.save(model_dir + path_suffix + '.npy', np.array(w.coef_))
 
 if __name__ == "__main__":
